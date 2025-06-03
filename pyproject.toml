@@ -1,0 +1,19 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = [ "poetry-core" ]
+
+[tool.poetry]
+name = "git-export"
+version = "0.0.0"
+description = ""
+authors = [ "Christoph Dörrer <d-chris@web.de>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pathlibutil = ">0.3.0"
+pathspec = ">0.12.0"
+click = ">8.0.0"
+
+[tool.poetry.scripts]
+git-export = "git_export.__main__:main"
