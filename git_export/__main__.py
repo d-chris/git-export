@@ -1,51 +1,57 @@
+import traceback
+
 import click
 
 from git_export import PathSpec
 
 
-class TypeTuple(click.ParamType):
-    """A custom type for click that accepts a tuple of two strings."""
+def main(filename: str) -> int:
+    """prints all files which are matched by the given pathspec file."""
 
-    name = "type_tuple"
+    spec = PathSpec.from_file(filename)
 
-    def convert(self, value, param, ctx):
+    for file in spec:
+        click.echo(file)
 
-        try:
-            suffix, directory = value.split()
-
-            if suffix.startswith("."):
-                return suffix, directory
-
-        except Exception:
-            pass
-
-        self.fail(repr(value), param, ctx)
+    return 0
 
 
 @click.command()
-@click.option(
-    "--filename",
+@click.argument(
+    "filename",
     type=click.Path(exists=True, dir_okay=False),
-    default=".gitignore",
+    default=".gitexport",
+)
+@click.option(
+    "--verbose",
+    "-v",
+    is_flag=True,
+    help="Prints the full traceback in case of an error.",
 )
 @click.version_option(
     prog_name="git-export",
 )
-@click.option(
-    "--type",
-    type=TypeTuple(),
-)
-def main(filename, type):
-    """prints all files which are matched by the given pathspec file."""
+def cli(verbose: bool, **kwargs) -> None:
+    """
+    Prints all files matched by the given pathspec file.
 
-    print(type)
+    The default pathspec file is '.gitexport'.
+    """
 
-    spec = PathSpec.from_file(filename)
+    try:
+        exitcode = main(**kwargs)
+    except Exception as e:
+        exitcode = 1
 
-    return
-    for file in spec:
-        click.echo(file)
+        if verbose:
+            message = traceback.format_exc()
+        else:
+            message = repr(e)
+
+        click.echo(message, err=True)
+    finally:
+        raise SystemExit(exitcode)
 
 
 if __name__ == "__main__":
-    main()
+    cli()
