@@ -13,7 +13,7 @@ class PathSpec(pathspec.PathSpec):
     @property
     def file(self) -> Path:
         try:
-            return self._filename
+            return self._filename  # type: ignore[attr-defined]
         except AttributeError as e:
             raise AttributeError(
                 f"{type(self)} has no file attribute, use `from_file()`."
